@@ -1,0 +1,1769 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "CardV B2B API",
+    "version": "1.0.0",
+    "description": "Merchant API for CardV B2B virtual product supply chain. Every request sends X-Key-Id, X-Timestamp, X-Nonce and X-Signature; the signature is HMAC-SHA256 with the signing secret, which is shown once at key creation and never sent over the wire. See https://cardv.net/developers/authentication/."
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "operationId": "health_retrieve",
+        "description": "Return API, database, and cache health status.",
+        "tags": [
+          "health"
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/account": {
+      "get": {
+        "operationId": "v1_account_retrieve",
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {
+            "MerchantKeyIdAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantAccount"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/balance": {
+      "get": {
+        "operationId": "v1_balance_retrieve",
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {
+            "MerchantKeyIdAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletAccount"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/orders": {
+      "post": {
+        "operationId": "merchant_order_create",
+        "tags": [
+          "v1"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreate"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreate"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "MerchantKeyIdAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderCreateResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/orders/{order_id}": {
+      "get": {
+        "operationId": "merchant_order_retrieve",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {
+            "MerchantKeyIdAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MerchantOrder"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/recharge/countries": {
+      "get": {
+        "operationId": "merchant_recharge_countries",
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {
+            "MerchantKeyIdAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RechargeCountryList"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/recharge/operators": {
+      "get": {
+        "operationId": "merchant_recharge_operators",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "country",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {
+            "MerchantKeyIdAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RechargeOperatorList"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/recharge/orders": {
+      "get": {
+        "operationId": "merchant_recharge_orders_list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {
+            "MerchantKeyIdAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RechargeOrderList"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      },
+      "post": {
+        "operationId": "merchant_recharge_order_create",
+        "tags": [
+          "v1"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RechargeOrderCreate"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RechargeOrderCreate"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/RechargeOrderCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "MerchantKeyIdAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RechargeOrderCreateResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RechargeOrderCreateResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/recharge/orders/{order_id}": {
+      "get": {
+        "operationId": "merchant_recharge_order_detail",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "order_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {
+            "MerchantKeyIdAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RechargeOrder"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/recharge/quote": {
+      "post": {
+        "operationId": "merchant_recharge_quote",
+        "tags": [
+          "v1"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RechargeQuoteRequest"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RechargeQuoteRequest"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/RechargeQuoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "MerchantKeyIdAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RechargeQuote"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/skus": {
+      "get": {
+        "operationId": "merchant_skus_list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "brand",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "product_type",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "region",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vertical",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {
+            "MerchantKeyIdAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogListResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/skus/{sku_id}": {
+      "get": {
+        "operationId": "merchant_sku_retrieve",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sku_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {
+            "MerchantKeyIdAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogSKU"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/skus/{sku_id}/quote": {
+      "get": {
+        "operationId": "merchant_sku_quote",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "amount",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "quantity",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "sku_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {
+            "MerchantKeyIdAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogQuote"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AmountModelEnum": {
+        "enum": [
+          "fixed",
+          "range"
+        ],
+        "type": "string",
+        "description": "* `fixed` - fixed\n* `range` - range"
+      },
+      "CatalogListResponse": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "results": {
+            "type": "array",
+            "items": {}
+          }
+        },
+        "required": [
+          "count",
+          "limit",
+          "results"
+        ]
+      },
+      "CatalogQuote": {
+        "type": "object",
+        "properties": {
+          "sku_id": {
+            "type": "string"
+          },
+          "settlement_currency": {
+            "type": "string"
+          },
+          "merchant_price": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "total_price": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,10}(?:\\.\\d{0,4})?$"
+          },
+          "min_quantity": {
+            "type": "integer"
+          },
+          "max_quantity": {
+            "type": "integer"
+          },
+          "availability": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "availability",
+          "max_quantity",
+          "merchant_price",
+          "min_quantity",
+          "quantity",
+          "settlement_currency",
+          "sku_id",
+          "total_price"
+        ]
+      },
+      "CatalogSKU": {
+        "type": "object",
+        "properties": {
+          "sku_id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "brand": {
+            "type": "string"
+          },
+          "brand_logo_url": {
+            "type": "string",
+            "readOnly": true
+          },
+          "category": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "region_name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "region_label": {
+            "type": "string",
+            "readOnly": true
+          },
+          "vertical": {
+            "type": "string"
+          },
+          "product_type": {
+            "type": "string"
+          },
+          "delivery_type": {
+            "$ref": "#/components/schemas/DeliveryTypeEnum"
+          },
+          "image_url": {
+            "type": "string",
+            "readOnly": true
+          },
+          "description": {
+            "type": "string"
+          },
+          "redemption_instructions": {
+            "type": "string"
+          },
+          "terms": {
+            "type": "string"
+          },
+          "disclaimer": {
+            "type": "string"
+          },
+          "denomination_type": {
+            "$ref": "#/components/schemas/DenominationTypeEnum"
+          },
+          "denomination_value": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$"
+          },
+          "min_face_value": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$"
+          },
+          "max_face_value": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$"
+          },
+          "face_currency": {
+            "type": "string",
+            "maxLength": 3
+          },
+          "settlement_currency": {
+            "type": "string"
+          },
+          "merchant_price": {
+            "type": "string",
+            "readOnly": true
+          },
+          "price_label": {
+            "type": "string",
+            "readOnly": true
+          },
+          "face_value_label": {
+            "type": "string",
+            "readOnly": true
+          },
+          "discount": {
+            "type": "string",
+            "readOnly": true
+          },
+          "availability": {
+            "type": "string",
+            "readOnly": true
+          },
+          "min_quantity": {
+            "type": "integer",
+            "maximum": 2147483647,
+            "minimum": 0
+          },
+          "max_quantity": {
+            "type": "integer",
+            "maximum": 2147483647,
+            "minimum": 0
+          },
+          "required_input_schema": {}
+        },
+        "required": [
+          "availability",
+          "brand",
+          "brand_logo_url",
+          "category",
+          "denomination_value",
+          "description",
+          "disclaimer",
+          "discount",
+          "face_value_label",
+          "image_url",
+          "merchant_price",
+          "name",
+          "price_label",
+          "product_id",
+          "product_name",
+          "product_type",
+          "redemption_instructions",
+          "region",
+          "region_label",
+          "region_name",
+          "required_input_schema",
+          "settlement_currency",
+          "sku_id",
+          "terms",
+          "vertical"
+        ]
+      },
+      "DeliveryTypeEnum": {
+        "enum": [
+          "code",
+          "code_pin",
+          "code_serial",
+          "url",
+          "direct_charge",
+          "mixed",
+          "unknown"
+        ],
+        "type": "string",
+        "description": "* `code` - Code\n* `code_pin` - Code + PIN\n* `code_serial` - Code + Serial\n* `url` - URL\n* `direct_charge` - Direct charge\n* `mixed` - Mixed\n* `unknown` - Unknown"
+      },
+      "DenominationTypeEnum": {
+        "enum": [
+          "fixed",
+          "range"
+        ],
+        "type": "string",
+        "description": "* `fixed` - Fixed\n* `range` - Range"
+      },
+      "HealthResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "service": {
+            "type": "string"
+          },
+          "database": {
+            "type": "string"
+          },
+          "cache": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "cache",
+          "database",
+          "service",
+          "status"
+        ]
+      },
+      "KybStatusEnum": {
+        "enum": [
+          "pending",
+          "reviewing",
+          "approved",
+          "rejected"
+        ],
+        "type": "string",
+        "description": "* `pending` - Pending\n* `reviewing` - Reviewing\n* `approved` - Approved\n* `rejected` - Rejected"
+      },
+      "MerchantAccount": {
+        "type": "object",
+        "properties": {
+          "merchant_id": {
+            "type": "string",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "legal_name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "billing_email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "status": {
+            "$ref": "#/components/schemas/MerchantAccountStatusEnum"
+          },
+          "kyb_status": {
+            "$ref": "#/components/schemas/KybStatusEnum"
+          },
+          "api_access_enabled": {
+            "type": "boolean"
+          },
+          "recharge_enabled": {
+            "type": "boolean"
+          },
+          "default_currency": {
+            "type": "string",
+            "maxLength": 3
+          },
+          "purchase_limits": {
+            "type": "object",
+            "additionalProperties": {},
+            "readOnly": true
+          }
+        },
+        "required": [
+          "billing_email",
+          "merchant_id",
+          "name",
+          "purchase_limits"
+        ]
+      },
+      "MerchantAccountStatusEnum": {
+        "enum": [
+          "active",
+          "suspended",
+          "closed"
+        ],
+        "type": "string",
+        "description": "* `active` - Active\n* `suspended` - Suspended\n* `closed` - Closed"
+      },
+      "MerchantOrder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "order_id": {
+            "type": "string"
+          },
+          "external_order_id": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 120
+          },
+          "channel": {
+            "type": "string",
+            "maxLength": 20
+          },
+          "status": {
+            "$ref": "#/components/schemas/MerchantOrderStatusEnum"
+          },
+          "currency": {
+            "type": "string",
+            "maxLength": 3
+          },
+          "total_amount": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,10}(?:\\.\\d{0,4})?$"
+          },
+          "item_summary": {
+            "type": "string",
+            "readOnly": true
+          },
+          "invoice_url": {
+            "type": "string",
+            "readOnly": true
+          },
+          "delivery_file_url": {
+            "type": "string",
+            "readOnly": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItem"
+            }
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderEvent"
+            },
+            "readOnly": true
+          }
+        },
+        "required": [
+          "created_at",
+          "delivery_file_url",
+          "events",
+          "id",
+          "invoice_url",
+          "item_summary",
+          "items",
+          "order_id",
+          "updated_at"
+        ]
+      },
+      "MerchantOrderStatusEnum": {
+        "enum": [
+          "created",
+          "accepted",
+          "processing",
+          "succeeded",
+          "partially_succeeded",
+          "failed",
+          "cancelled",
+          "refunded"
+        ],
+        "type": "string",
+        "description": "* `created` - Created\n* `accepted` - Accepted\n* `processing` - Processing\n* `succeeded` - Succeeded\n* `partially_succeeded` - Partially succeeded\n* `failed` - Failed\n* `cancelled` - Cancelled\n* `refunded` - Refunded"
+      },
+      "OrderCreate": {
+        "type": "object",
+        "properties": {
+          "external_order_id": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderCreateItem"
+            }
+          }
+        },
+        "required": [
+          "external_order_id",
+          "items"
+        ]
+      },
+      "OrderCreateItem": {
+        "type": "object",
+        "properties": {
+          "sku_id": {
+            "type": "string"
+          },
+          "sku_code": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1
+          },
+          "amount": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$"
+          },
+          "expected_unit_price": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$"
+          },
+          "inputs": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "OrderCreateResponse": {
+        "type": "object",
+        "properties": {
+          "idempotent_replay": {
+            "type": "boolean"
+          },
+          "order": {
+            "$ref": "#/components/schemas/MerchantOrder"
+          }
+        },
+        "required": [
+          "idempotent_replay",
+          "order"
+        ]
+      },
+      "OrderEvent": {
+        "type": "object",
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "event_type": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 240
+          }
+        },
+        "required": [
+          "created_at",
+          "event_type"
+        ]
+      },
+      "OrderItem": {
+        "type": "object",
+        "properties": {
+          "sku_id": {
+            "type": "string"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "brand": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "denomination_type": {
+            "type": "string"
+          },
+          "denomination_value": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$"
+          },
+          "min_face_value": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$"
+          },
+          "max_face_value": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$"
+          },
+          "face_currency": {
+            "type": "string"
+          },
+          "face_value_label": {
+            "type": "string",
+            "readOnly": true
+          },
+          "quantity": {
+            "type": "integer",
+            "maximum": 2147483647,
+            "minimum": 0
+          },
+          "unit_price": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$"
+          },
+          "total_price": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,10}(?:\\.\\d{0,4})?$"
+          },
+          "settlement_currency": {
+            "type": "string"
+          },
+          "fulfillment_status": {
+            "type": "string",
+            "readOnly": true
+          },
+          "fulfillment_attempts": {
+            "type": "array",
+            "items": {},
+            "readOnly": true
+          },
+          "delivery_count": {
+            "type": "integer",
+            "readOnly": true
+          },
+          "delivery_summary": {
+            "type": "array",
+            "items": {},
+            "readOnly": true
+          },
+          "deliveries": {
+            "type": "array",
+            "items": {},
+            "readOnly": true
+          },
+          "delivery_payload": {
+            "type": "object",
+            "additionalProperties": {},
+            "readOnly": true
+          }
+        },
+        "required": [
+          "brand",
+          "deliveries",
+          "delivery_count",
+          "delivery_payload",
+          "delivery_summary",
+          "denomination_type",
+          "denomination_value",
+          "face_currency",
+          "face_value_label",
+          "fulfillment_attempts",
+          "fulfillment_status",
+          "label",
+          "max_face_value",
+          "min_face_value",
+          "product_name",
+          "settlement_currency",
+          "sku_id",
+          "total_price",
+          "unit_price"
+        ]
+      },
+      "RechargeAmountOption": {
+        "type": "object",
+        "properties": {
+          "min": {
+            "type": "string",
+            "description": "Minimum local amount, 4-decimal string."
+          },
+          "max": {
+            "type": "string",
+            "description": "Maximum local amount; equals min for fixed denominations."
+          },
+          "currency": {
+            "type": "string"
+          },
+          "subtype": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "currency",
+          "label",
+          "max",
+          "min",
+          "subtype"
+        ]
+      },
+      "RechargeAttempt": {
+        "type": "object",
+        "properties": {
+          "attempt_no": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          },
+          "error_message": {
+            "type": "string"
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "attempt_no",
+          "completed_at",
+          "error_message",
+          "status",
+          "submitted_at"
+        ]
+      },
+      "RechargeCountry": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code."
+          },
+          "name": {
+            "type": "string"
+          },
+          "currency_codes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "operator_count": {
+            "type": "integer"
+          },
+          "offer_count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "currency_codes",
+          "name",
+          "offer_count",
+          "operator_count"
+        ]
+      },
+      "RechargeCountryList": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RechargeCountry"
+            }
+          }
+        },
+        "required": [
+          "count",
+          "results"
+        ]
+      },
+      "RechargeItem": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "face_value": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "currency",
+          "face_value",
+          "label",
+          "product_name",
+          "quantity",
+          "type"
+        ]
+      },
+      "RechargeOperator": {
+        "type": "object",
+        "properties": {
+          "operator_key": {
+            "type": "string",
+            "description": "Pass this value to quote and order requests."
+          },
+          "name": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "country_name": {
+            "type": "string"
+          },
+          "logo_url": {
+            "type": "string",
+            "description": "CardV-hosted logo URL, or empty."
+          },
+          "subtypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "amount_model": {
+            "$ref": "#/components/schemas/AmountModelEnum"
+          },
+          "currency_codes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "amounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RechargeAmountOption"
+            }
+          },
+          "offer_count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "amount_model",
+          "amounts",
+          "country",
+          "country_name",
+          "currency_codes",
+          "logo_url",
+          "name",
+          "offer_count",
+          "operator_key",
+          "subtypes"
+        ]
+      },
+      "RechargeOperatorList": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RechargeOperator"
+            }
+          }
+        },
+        "required": [
+          "count",
+          "results"
+        ]
+      },
+      "RechargeOperatorRef": {
+        "type": "object",
+        "properties": {
+          "operator_key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "logo_url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "logo_url",
+          "name",
+          "operator_key"
+        ]
+      },
+      "RechargeOrder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "order_id": {
+            "type": "string",
+            "description": "Public order ID (O-...). Use it for lookups."
+          },
+          "external_order_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "order_status": {
+            "type": "string"
+          },
+          "status_title": {
+            "type": "string"
+          },
+          "status_message": {
+            "type": "string"
+          },
+          "next_step": {
+            "type": "string"
+          },
+          "latest_attempt_status": {
+            "type": "string"
+          },
+          "latest_attempt_message": {
+            "type": "string"
+          },
+          "poll_after_seconds": {
+            "type": "integer"
+          },
+          "country": {
+            "type": "string"
+          },
+          "country_name": {
+            "type": "string"
+          },
+          "operator": {
+            "$ref": "#/components/schemas/RechargeOperatorRef"
+          },
+          "subtype": {
+            "type": "string"
+          },
+          "item": {
+            "$ref": "#/components/schemas/RechargeItem"
+          },
+          "account": {
+            "type": "string",
+            "description": "Masked recipient account."
+          },
+          "account_hint": {
+            "type": "string"
+          },
+          "local_amount": {
+            "type": "string"
+          },
+          "local_currency": {
+            "type": "string"
+          },
+          "merchant_price": {
+            "type": "string"
+          },
+          "merchant_currency": {
+            "type": "string"
+          },
+          "attempts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RechargeAttempt"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "account",
+          "account_hint",
+          "attempts",
+          "country",
+          "country_name",
+          "created_at",
+          "external_order_id",
+          "id",
+          "item",
+          "latest_attempt_message",
+          "latest_attempt_status",
+          "local_amount",
+          "local_currency",
+          "merchant_currency",
+          "merchant_price",
+          "next_step",
+          "operator",
+          "order_id",
+          "order_status",
+          "poll_after_seconds",
+          "status",
+          "status_message",
+          "status_title",
+          "subtype",
+          "updated_at"
+        ]
+      },
+      "RechargeOrderCreate": {
+        "type": "object",
+        "properties": {
+          "external_order_id": {
+            "type": "string",
+            "description": "Your unique reference; repeats return the existing order."
+          },
+          "country": {
+            "type": "string"
+          },
+          "operator_key": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Same local-currency amount as the quote."
+          },
+          "local_currency": {
+            "type": "string",
+            "description": "Optional ISO 4217 code of amount, same value as the quote."
+          },
+          "account": {
+            "type": "string",
+            "description": "Recipient phone number for the selected country, preferably with country code (e.g. 60123456789 or +60 12-345 6789); a national number is also accepted. It is normalized to E.164 digits; an invalid number returns 400 before any balance is debited. Returned only in masked form."
+          },
+          "subtype": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SubtypeEnum"
+              }
+            ],
+            "default": "airtime"
+          },
+          "quote_token": {
+            "type": "string",
+            "description": "quote_token from POST /recharge/quote, valid for 300 seconds."
+          }
+        },
+        "required": [
+          "account",
+          "amount",
+          "country",
+          "external_order_id",
+          "operator_key",
+          "quote_token"
+        ]
+      },
+      "RechargeOrderCreateResponse": {
+        "type": "object",
+        "properties": {
+          "idempotent_replay": {
+            "type": "boolean"
+          },
+          "order": {
+            "$ref": "#/components/schemas/RechargeOrder"
+          }
+        },
+        "required": [
+          "idempotent_replay",
+          "order"
+        ]
+      },
+      "RechargeOrderList": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RechargeOrder"
+            }
+          }
+        },
+        "required": [
+          "count",
+          "limit",
+          "results"
+        ]
+      },
+      "RechargeQuote": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string"
+          },
+          "country_name": {
+            "type": "string"
+          },
+          "operator": {
+            "$ref": "#/components/schemas/RechargeOperatorRef"
+          },
+          "subtype": {
+            "type": "string"
+          },
+          "local_amount": {
+            "type": "string"
+          },
+          "local_currency": {
+            "type": "string"
+          },
+          "merchant_price": {
+            "type": "string",
+            "description": "Amount debited from your wallet, 4-decimal string."
+          },
+          "merchant_currency": {
+            "type": "string"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "quote_token": {
+            "type": "string",
+            "description": "Signed token; send it unchanged when creating the order before expires_at."
+          }
+        },
+        "required": [
+          "country",
+          "country_name",
+          "expires_at",
+          "local_amount",
+          "local_currency",
+          "merchant_currency",
+          "merchant_price",
+          "operator",
+          "quote_token",
+          "subtype"
+        ]
+      },
+      "RechargeQuoteRequest": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string"
+          },
+          "operator_key": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Local-currency amount to deliver."
+          },
+          "local_currency": {
+            "type": "string",
+            "description": "Optional ISO 4217 code of amount, from the operator's currency_codes."
+          },
+          "subtype": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SubtypeEnum"
+              }
+            ],
+            "default": "airtime"
+          }
+        },
+        "required": [
+          "amount",
+          "country",
+          "operator_key"
+        ]
+      },
+      "SubtypeEnum": {
+        "enum": [
+          "airtime",
+          "data",
+          "bundle"
+        ],
+        "type": "string",
+        "description": "* `airtime` - airtime\n* `data` - data\n* `bundle` - bundle"
+      },
+      "WalletAccount": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "maxLength": 3
+          },
+          "balance": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,10}(?:\\.\\d{0,4})?$"
+          },
+          "reserved_amount": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,10}(?:\\.\\d{0,4})?$"
+          },
+          "available_balance": {
+            "type": "string",
+            "readOnly": true
+          },
+          "low_balance_threshold": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,10}(?:\\.\\d{0,4})?$"
+          },
+          "low_balance_notified_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "is_active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "available_balance"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "MerchantKeyIdAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Key-Id",
+        "description": "Public API key ID (ck_live_... / ck_test_...). Every request must also carry X-Timestamp, X-Nonce and an X-Signature computed with the signing secret."
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://b2b.cardv.net",
+      "description": "Live"
+    },
+    {
+      "url": "https://sandbox.cardv.net",
+      "description": "Sandbox"
+    }
+  ]
+}

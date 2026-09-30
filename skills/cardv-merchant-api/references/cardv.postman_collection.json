@@ -1,0 +1,425 @@
+{
+  "info": {
+    "name": "CardV Merchant API",
+    "description": "Signed requests to the CardV merchant API. Set baseUrl, keyId and signingSecret in the collection variables. Docs: https://cardv.net/developers/",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Signs every request: X-Key-Id + X-Timestamp + X-Nonce + X-Signature.",
+          "// Set keyId and signingSecret in the collection variables (keep the secret in 'Current value' only).",
+          "const secret = pm.variables.get('signingSecret');",
+          "const keyId = pm.variables.get('keyId');",
+          "if (!secret || !keyId) { throw new Error('Set keyId and signingSecret in the collection variables.'); }",
+          "const method = pm.request.method.toUpperCase();",
+          "let path = pm.request.url.getPathWithQuery();",
+          "pm.request.url.variables.each((v) => { path = path.replace(':' + v.key, encodeURIComponent(pm.variables.replaceIn(v.value || ''))); });",
+          "path = pm.variables.replaceIn(path);",
+          "const body = pm.request.body && pm.request.body.mode === 'raw' ? pm.variables.replaceIn(pm.request.body.raw || '') : '';",
+          "if (body) { pm.request.body.update(body); }",
+          "const ts = Math.floor(Date.now() / 1000).toString();",
+          "const nonce = CryptoJS.lib.WordArray.random(16).toString(CryptoJS.enc.Hex);",
+          "const bodyHash = CryptoJS.SHA256(CryptoJS.enc.Utf8.parse(body)).toString(CryptoJS.enc.Hex);",
+          "const text = [method, path, ts, nonce, bodyHash].join('\\n');",
+          "const signature = CryptoJS.HmacSHA256(text, secret).toString(CryptoJS.enc.Hex);",
+          "pm.request.headers.upsert({ key: 'X-Key-Id', value: keyId });",
+          "pm.request.headers.upsert({ key: 'X-Timestamp', value: ts });",
+          "pm.request.headers.upsert({ key: 'X-Nonce', value: nonce });",
+          "pm.request.headers.upsert({ key: 'X-Signature', value: signature });"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://sandbox.cardv.net"
+    },
+    {
+      "key": "keyId",
+      "value": "ck_test_replace_me"
+    },
+    {
+      "key": "signingSecret",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Account",
+      "item": [
+        {
+          "name": "GET /api/health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health"
+              ],
+              "variable": []
+            },
+            "description": "Return API, database, and cache health status."
+          }
+        },
+        {
+          "name": "GET /api/v1/account",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/account",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "account"
+              ],
+              "variable": []
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "GET /api/v1/balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/balance",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "balance"
+              ],
+              "variable": []
+            },
+            "description": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "POST /api/v1/orders",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ],
+              "variable": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"external_order_id\":\"\",\"items\":[]}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /api/v1/orders/{order_id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders/:order_id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders",
+                ":order_id"
+              ],
+              "variable": [
+                {
+                  "key": "order_id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "Mobile recharge",
+      "item": [
+        {
+          "name": "GET /api/v1/recharge/countries",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recharge/countries",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "recharge",
+                "countries"
+              ],
+              "variable": []
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "GET /api/v1/recharge/operators",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recharge/operators",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "recharge",
+                "operators"
+              ],
+              "variable": []
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "GET /api/v1/recharge/orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recharge/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "recharge",
+                "orders"
+              ],
+              "variable": []
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "POST /api/v1/recharge/orders",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recharge/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "recharge",
+                "orders"
+              ],
+              "variable": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"external_order_id\":\"\",\"country\":\"\",\"operator_key\":\"\",\"amount\":\"\",\"local_currency\":\"\",\"account\":\"\",\"subtype\":\"\",\"quote_token\":\"\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /api/v1/recharge/orders/{order_id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recharge/orders/:order_id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "recharge",
+                "orders",
+                ":order_id"
+              ],
+              "variable": [
+                {
+                  "key": "order_id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "POST /api/v1/recharge/quote",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recharge/quote",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "recharge",
+                "quote"
+              ],
+              "variable": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"country\":\"\",\"operator_key\":\"\",\"amount\":\"\",\"local_currency\":\"\",\"subtype\":\"\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Catalog",
+      "item": [
+        {
+          "name": "GET /api/v1/skus",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/skus",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "skus"
+              ],
+              "variable": []
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "GET /api/v1/skus/{sku_id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/skus/:sku_id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "skus",
+                ":sku_id"
+              ],
+              "variable": [
+                {
+                  "key": "sku_id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "GET /api/v1/skus/{sku_id}/quote",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/skus/:sku_id/quote",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "skus",
+                ":sku_id",
+                "quote"
+              ],
+              "variable": [
+                {
+                  "key": "sku_id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": ""
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -75,7 +75,7 @@ Money is a string with 4 decimals. Parse it with a decimal type, never float. Pa
 
 Events: `order.succeeded`, `order.partially_succeeded`, `order.failed`, `order.refunded`. They never contain codes: re-read the order.
 
-- Verify `X-CardV-Signature: t=<ts>,v1=<hex>` where `v1 = HMAC-SHA256(webhook secret, "<t>." + raw body bytes)`, on the **raw** bytes before JSON parsing, constant-time compare, reject if `t` is more than 300 s off. `scripts/verify_webhook.py --self-test` checks the published vector.
+- Verify `X-CardV-Signature: t=<ts>,v2=<hex>` where `v2 = HMAC-SHA256(webhook secret, "<t>.<X-CardV-Delivery>.<X-CardV-Event>." + raw body bytes)`, on the **raw** bytes before JSON parsing, constant-time compare, reject if `t` is more than 300 s off. Reject a header without `v2`. `scripts/verify_webhook.py --self-test` checks the published vector.
 - Answer 2xx within 15 s after storing the event; do slow work afterwards. No redirects are followed. Up to 6 tries.
 - Deduplicate on `order.order_id` + `event`; events can repeat and arrive out of order. Also run a job for unfinished orders older than a few minutes.
 
@@ -85,7 +85,7 @@ Separate flow: `GET /recharge/countries` → `GET /recharge/operators?country=XX
 
 ## Review checklist
 
-Signed bytes = sent bytes · no trailing slash, query string signed · new nonce and timestamp per try · same `external_order_id` on retry · `expected_unit_price` sent · decimals, not floats · every non-empty code field delivered · webhook verified on raw bytes, `event` read from the body · no codes or secrets in logs · clear `User-Agent` set.
+Signed bytes = sent bytes · no trailing slash, query string signed · new nonce and timestamp per try · same `external_order_id` on retry · `expected_unit_price` sent · decimals, not floats · every non-empty code field delivered · webhook `v2` verified on raw bytes with `X-CardV-Delivery` and `X-CardV-Event` · no codes or secrets in logs · clear `User-Agent` set.
 
 ## Files in this skill
 

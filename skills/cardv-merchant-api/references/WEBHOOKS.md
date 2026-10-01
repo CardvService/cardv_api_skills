@@ -32,7 +32,7 @@ User-Agent: CardV-B2B-Webhook/1.0
 X-CardV-Event: order.succeeded
 X-CardV-Delivery: 5521
 X-CardV-Timestamp: 1790000100
-X-CardV-Signature: t=1790000100,v1=2baac51da272ee8d4b7b1382d48037976c7272f1749c9399a50e758604de8a27
+X-CardV-Signature: t=1790000100,v2=f6b8211c04974459e532665349fcbc65130f5256a1972ad9a6480f5b1f9d68c0
 ```
 
 The body, shown formatted here (CardV sends it on one line):
@@ -72,27 +72,30 @@ The Portal shows the secret **only once**, when you create the webhook or reset 
 How the signature works:
 
 ```text
-X-CardV-Signature: t=<unix seconds>,v1=<lowercase hex>
-v1 = HMAC-SHA256(key = signing secret, message = "<t>" + "." + raw body bytes)
+X-CardV-Signature: t=<unix seconds>,v2=<lowercase hex>
+v2 = HMAC-SHA256(key = signing secret,
+                 message = "<t>.<X-CardV-Delivery>.<X-CardV-Event>." + raw body bytes)
 ```
 
 Steps:
 
 1. Read the **raw body bytes**, before you parse the JSON.
-2. Take `t` and `v1` from the header.
+2. Take `t` and `v2` from the `X-CardV-Signature` header, and read the `X-CardV-Delivery` and `X-CardV-Event` headers.
 3. Reject the message if `t` is more than 300 seconds from your clock.
-4. Compute the expected `v1` and compare it with a constant-time compare.
+4. Compute the expected `v2` and compare it with a constant-time compare.
 5. Only then parse the JSON.
 
-Only `t` and the body are signed. Take the event type from the body's `event` field,
-not from the `X-CardV-Event` header.
+The signature covers `t`, the `X-CardV-Delivery` and `X-CardV-Event` headers, and the body.
+Once the check passes you can trust all of them. Reject a header that has no `v2` value.
 
 **Test vector** (fake secret):
 
 ```text
 secret   whsec_TEST_ONLY_not_a_real_secret_000000000000
 t        1790000100
-v1       2baac51da272ee8d4b7b1382d48037976c7272f1749c9399a50e758604de8a27
+delivery 5521
+event    order.succeeded
+v2       f6b8211c04974459e532665349fcbc65130f5256a1972ad9a6480f5b1f9d68c0
 ```
 
 The body for this vector is exactly this one line (266 bytes, no newline at the end):
@@ -111,23 +114,26 @@ app = Flask(__name__)
 SECRET = os.environ["CARDV_WEBHOOK_SECRET"].encode()
 
 
-def verify(raw_body: bytes, header: str, tolerance: int = 300) -> bool:
+def verify(raw_body: bytes, headers, tolerance: int = 300) -> bool:
     try:
-        parts = dict(item.split("=", 1) for item in header.split(","))
-        t, v1 = parts["t"].strip(), parts["v1"].strip()
+        sig = headers.get("X-CardV-Signature", "")
+        parts = dict(item.split("=", 1) for item in sig.split(","))
+        t, v2 = parts["t"].strip(), parts["v2"].strip()
     except (KeyError, ValueError):
         return False
+    delivery = headers.get("X-CardV-Delivery", "")
+    event = headers.get("X-CardV-Event", "")
     if not t.isdigit() or abs(time.time() - int(t)) > tolerance:
         return False
-    signed = t.encode() + b"." + raw_body
+    signed = f"{t}.{delivery}.{event}.".encode() + raw_body
     expected = hmac.new(SECRET, signed, hashlib.sha256).hexdigest()
-    return hmac.compare_digest(expected.encode(), v1.encode())  # constant time
+    return hmac.compare_digest(expected.encode(), v2.encode())  # constant time
 
 
 @app.post("/cardv/webhook")
 def cardv_webhook():
     raw = request.get_data()  # raw bytes, before JSON parsing
-    if not verify(raw, request.headers.get("X-CardV-Signature", "")):
+    if not verify(raw, request.headers):
         abort(400)
     event = request.get_json()
     store_event(request.headers["X-CardV-Delivery"], event)  # your code
@@ -143,21 +149,23 @@ import express from "express";
 const app = express();
 const SECRET = process.env.CARDV_WEBHOOK_SECRET;
 
-function verify(rawBody, header, toleranceSeconds = 300) {
+function verify(rawBody, req, toleranceSeconds = 300) {
   const parts = {};
-  for (const p of String(header || "").split(",")) {
+  for (const p of String(req.get("X-CardV-Signature") || "").split(",")) {
     const i = p.indexOf("=");
     parts[p.slice(0, i).trim()] = p.slice(i + 1).trim();
   }
-  const { t, v1 } = parts;
-  if (!t || !v1 || !/^\d+$/.test(t)) return false;
+  const { t, v2 } = parts;
+  if (!t || !v2 || !/^\d+$/.test(t)) return false;
   const now = Math.floor(Date.now() / 1000);
   if (Math.abs(now - Number(t)) > toleranceSeconds) return false;
+  const delivery = req.get("X-CardV-Delivery") || "";
+  const event = req.get("X-CardV-Event") || "";
   const expected = crypto.createHmac("sha256", SECRET)
-    .update(Buffer.concat([Buffer.from(`${t}.`, "utf8"), rawBody]))
+    .update(Buffer.concat([Buffer.from(`${t}.${delivery}.${event}.`, "utf8"), rawBody]))
     .digest("hex");
   const a = Buffer.from(expected, "utf8");
-  const b = Buffer.from(v1, "utf8");
+  const b = Buffer.from(v2, "utf8");
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
@@ -165,7 +173,7 @@ function verify(rawBody, header, toleranceSeconds = 300) {
 const rawJson = express.raw({ type: "application/json" });
 
 app.post("/cardv/webhook", rawJson, async (req, res) => {
-  if (!verify(req.body, req.get("X-CardV-Signature"))) return res.sendStatus(400);
+  if (!verify(req.body, req)) return res.sendStatus(400);
   const event = JSON.parse(req.body.toString("utf8"));
   await storeEvent(req.get("X-CardV-Delivery"), event); // your code
   res.sendStatus(204);

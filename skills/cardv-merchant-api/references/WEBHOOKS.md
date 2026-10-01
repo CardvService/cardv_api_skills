@@ -20,6 +20,7 @@ Related: [Catalog and orders](CATALOG-AND-ORDERS.md) · [Security](SECURITY.md)
 
 - Each event is sent at most once per order and webhook URL (plus [retries](#retries)).
 - There are no events for `accepted` or `processing`, or for adding funds.
+- Webhooks are sent only for orders placed through the API. Orders placed in the Portal send no webhooks.
 
 ## Payload
 
@@ -61,6 +62,8 @@ The body, shown formatted here (CardV sends it on one line):
 
 - `order.order_id` is the CardV order ID. `order.id` holds the same value.
 - `order.external_order_id` is your order number.
+- Match the webhook to your order with `order.external_order_id`. The webhook can arrive before
+  your create-order request returns, so you may not have saved `order.order_id` yet.
 - `order.status` is the status **at the time of the event**. It may be out of date.
 - `X-CardV-Delivery` is the ID of this message. The Portal shows it in the delivery history.
 
@@ -187,13 +190,14 @@ Both samples pass the test vector.
 - Answer with any **2xx** status within **15 seconds**, after you have saved the event.
   Do the slow work (reading the order, sending codes) afterwards.
 - Anything else counts as a failure: another status, a timeout, or a connection error.
+- If you cannot find the order yet, answer with a non-2xx status (for example `409`). CardV will try again.
 - CardV does **not follow redirects**. A 3xx answer is a failure.
   Register the exact final URL.
 - A failed message is retried, up to **6 tries in total**:
 
 | Try | When |
 | --- | --- |
-| 1 | Right after the event |
+| 1 | About 5 seconds after the event |
 | 2 | About 1 minute after try 1 failed |
 | 3 | About 5 minutes after try 2 failed |
 | 4 | About 15 minutes after try 3 failed |
@@ -208,7 +212,7 @@ You can see every message and send it again from the Portal's delivery history.
 The same event can arrive more than once, and events can arrive out of order.
 
 - Ignore an event you have already handled.
-  Match on `order.order_id` plus `event` from the verified body.
+  Match on `order.external_order_id` plus `event` from the verified body.
   A message resent from the Portal gets a new `X-CardV-Delivery` ID, so that ID alone is not enough.
 - The body is a snapshot from when the event happened.
   Always read the order again and act on its **current** status.

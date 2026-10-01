@@ -76,6 +76,7 @@ Money is a string with 4 decimals. Parse it with a decimal type, never float. Pa
 Events: `order.succeeded`, `order.partially_succeeded`, `order.failed`, `order.refunded`. They never contain codes: re-read the order.
 
 - Verify `X-CardV-Signature: t=<ts>,v2=<hex>` where `v2 = HMAC-SHA256(webhook secret, "<t>.<X-CardV-Delivery>.<X-CardV-Event>." + raw body bytes)`, on the **raw** bytes before JSON parsing, constant-time compare, reject if `t` is more than 300 s off. Reject a header without `v2`. `scripts/verify_webhook.py --self-test` checks the published vector.
+- Match a webhook to your order by `order.external_order_id` (it can arrive before your `POST /orders` response). If the order is not saved yet, answer non-2xx so CardV retries. Only API orders send webhooks; Portal orders do not.
 - Answer 2xx within 15 s after storing the event; do slow work afterwards. No redirects are followed. Up to 6 tries.
 - Deduplicate on `order.order_id` + `event`; events can repeat and arrive out of order. Also run a job for unfinished orders older than a few minutes.
 

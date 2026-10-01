@@ -75,7 +75,8 @@ Filters (all optional):
 | --- | --- | --- |
 | `search` | `steam` | SKU ID, name or brand |
 | `brand` | `Steam` | Brand name (any case) |
-| `region` | `US` | Country code or country name |
+| `region` | `US` | Country code or country name. `GLC` = global, `EU` = Europe |
+| `category` | `Travel` | Business category, for example `Travel`, `Digital Wallets & Payment`, `Game Credits` |
 | `vertical` | `gift_card` | Product line |
 | `product_type` | `pin_code` | How it is delivered |
 
@@ -108,7 +109,7 @@ Keep asking with a higher `offset` until `offset` reaches `count`.
       "...": "more fields"
     }
   ],
-  "filter_options": {"brands": [], "regions": [], "verticals": []}
+  "filter_options": {"brands": [], "regions": [], "categories": [], "verticals": []}
 }
 ```
 
@@ -122,6 +123,7 @@ The most useful fields:
 | `merchant_price` | Your price per unit, in `settlement_currency`. |
 | `availability` | `available` or `unavailable`. Only order `available` SKUs. |
 | `denomination_type` | `fixed` or `range`. See [fixed and range amounts](#fixed-and-range-amounts). |
+| `amount_step` | Range SKUs only. The amount must be a multiple of this value, for example `"1.0000"` means whole numbers only. `null` means no step. |
 | `face_currency` | Currency printed on the card. May differ from your wallet. |
 | `min_quantity`, `max_quantity` | How many units one order line may have. |
 | `product_type` | `pin_code` (you get a code) or `direct_charge` (we top up an account). |
@@ -147,6 +149,10 @@ Some SKUs have a **range**: your customer chooses the amount, such as 5 to 500 U
 
 For a range SKU, `amount` must be between `min_face_value` and `max_face_value`.
 It is in `face_currency`.
+
+Some range SKUs also have an `amount_step`. When it is not `null`, `amount` must be a multiple of it.
+For example, with `"amount_step": "1.0000"` you can send `25` but not `25.50`.
+A quote or order with an amount that does not fit the step returns HTTP 400 and charges nothing.
 
 ### Direct top-ups
 
@@ -195,7 +201,8 @@ GET /api/v1/skus/S000789/quote?quantity=1&amount=25.00
 - A quote does **not** hold the price. Prices can change at any time.
 - To protect yourself, send `merchant_price` as `expected_unit_price` when you order.
   If the price changed, CardV rejects the order and charges nothing.
-- A quantity or amount out of range returns HTTP 400 with a `quantity` or `amount` error.
+- A quantity or amount out of range, or an amount that is not a multiple of `amount_step`,
+  returns HTTP 400 with a `quantity` or `amount` error.
 
 ## Place an order
 
@@ -223,7 +230,7 @@ Like every call, it must be [signed](AUTHENTICATION.md#signing-a-request).
 | `items` | Yes | One or more order lines. |
 | `items[].sku_id` | Yes | The SKU to buy. |
 | `items[].quantity` | No | How many. Default 1. |
-| `items[].amount` | Range SKUs | The face value to buy. |
+| `items[].amount` | Range SKUs | The face value to buy. Must fit `min_face_value`, `max_face_value` and `amount_step`. |
 | `items[].expected_unit_price` | Recommended | The quoted `merchant_price`. Always send it. |
 | `items[].inputs` | Direct top-ups | Account details for [direct top-ups](#direct-top-ups). |
 

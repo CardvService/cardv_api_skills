@@ -66,6 +66,17 @@ GET /api/v1/skus?limit=100&offset=200
   {"detail": "Merchant API rate limit exceeded. Expected available in 23 seconds."}
   ```
 
+- New orders have a separate, lower limit: by default **20 new orders per minute**.
+  Gift card orders (`POST /orders`) and recharge orders (`POST /recharge/orders`) share it.
+  Your account may have a different number. An order request counts toward both limits.
+- Sending an `external_order_id` that already exists replays the original order.
+  The replay does not use the order limit, so a safe retry is not blocked by it.
+- Over the order limit, you also get HTTP 429 and `Retry-After`:
+
+  ```json
+  {"detail": "Merchant order rate limit exceeded. Expected available in 23 seconds."}
+  ```
+
 - To stay under it: cache the SKU list, use webhooks instead of fast polling,
   and wait a little longer after each 429.
 

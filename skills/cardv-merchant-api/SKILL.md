@@ -54,7 +54,7 @@ Auth failures are HTTP **403** (not 401) with `{"detail": ...}`; rate limit is *
 5. `POST /orders` (signed) with a unique `external_order_id` (1–120 chars, `A–Z a–z 0–9 - _ .`) and `expected_unit_price` = the quoted `merchant_price` on every line. Range SKUs send `amount`; direct top-ups send `inputs` per `required_input_schema`. `201` = new order, charged in full at once.
 6. Read codes with `GET /orders/{order_id}` or after a webhook. Codes are in `items[].deliveries[]`: give the customer every non-empty field (`card_number`, `pin_code`, `redeem_url`, `expiry_date`, `instructions`); never deliver a unit with `status: "voided"`.
 
-Money is a string with 4 decimals. Parse it with a decimal type, never float. Pay attention to `settlement_currency` (what you pay) vs `face_currency` (printed on the card).
+Money is a decimal string: prices and balances have 2 decimals (`"9.25"`), face values read like the card (`"10"`, `"12.50"`). Compare values as decimals, never as strings or floats; `"25"` and `"25.00"` are the same amount. Pay attention to `settlement_currency` (what you pay) vs `face_currency` (printed on the card).
 
 ## Retries and idempotency (most important)
 

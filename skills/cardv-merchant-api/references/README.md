@@ -77,7 +77,7 @@ Keys, balances, orders and product IDs are different in each environment.
    {
      "external_order_id": "TEST-0001",
      "items": [
-       {"sku_id": "S000001", "quantity": 1, "expected_unit_price": "9.2500"}
+       {"sku_id": "S000001", "quantity": 1, "expected_unit_price": "9.25"}
      ]
    }
    ```

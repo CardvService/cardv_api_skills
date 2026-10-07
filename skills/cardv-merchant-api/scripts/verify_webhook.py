@@ -46,11 +46,11 @@ def self_test() -> None:
     secret = b"whsec_TEST_ONLY_not_a_real_secret_000000000000"
     body = (
         b'{"event":"order.succeeded","order":{"id":"O-00000001","order_id":"O-00000001",'
-        b'"external_order_id":"TEST-0001","status":"succeeded","currency":"USD","total_amount":"9.2500",'
+        b'"external_order_id":"TEST-0001","status":"succeeded","currency":"USD","total_amount":"9.25",'
         b'"items":[{"sku_id":"S000001","product_name":"Example Card","quantity":1,"delivery_count":1}]}}'
     )
-    assert len(body) == 266
-    header = "t=1790000100,v2=f6b8211c04974459e532665349fcbc65130f5256a1972ad9a6480f5b1f9d68c0"
+    assert len(body) == 264
+    header = "t=1790000100,v2=a29bcc255a746592aacd8351a316478b6ff0d5337762ee66634635ef4100de90"
     assert verify(secret, body, header, "5521", "order.succeeded", now=1790000100)
     assert not verify(secret, body + b" ", header, "5521", "order.succeeded", now=1790000100)  # any byte change fails
     assert not verify(secret, body, header, "5522", "order.succeeded", now=1790000100)  # delivery header is signed

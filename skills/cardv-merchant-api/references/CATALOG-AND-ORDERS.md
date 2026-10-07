@@ -44,10 +44,10 @@ Related: [Authentication](AUTHENTICATION.md) · [Conventions](CONVENTIONS.md) ·
 ```json
 {
   "currency": "USD",
-  "balance": "1520.4000",
-  "reserved_amount": "0.0000",
-  "available_balance": "1520.4000",
-  "low_balance_threshold": "200.0000",
+  "balance": "1520.40",
+  "reserved_amount": "0.00",
+  "available_balance": "1520.40",
+  "low_balance_threshold": "200.00",
   "low_balance_notified_at": null,
   "is_active": true
 }
@@ -98,9 +98,9 @@ Keep asking with a higher `offset` until `offset` reaches `count`.
       "vertical": "gift_card",
       "product_type": "pin_code",
       "denomination_type": "fixed",
-      "denomination_value": "10.0000",
+      "denomination_value": "10",
       "face_currency": "USD",
-      "merchant_price": "9.2500",
+      "merchant_price": "9.25",
       "settlement_currency": "USD",
       "availability": "available",
       "min_quantity": 1,
@@ -123,7 +123,7 @@ The most useful fields:
 | `merchant_price` | Your price per unit, in `settlement_currency`. |
 | `availability` | `available` or `unavailable`. Only order `available` SKUs. |
 | `denomination_type` | `fixed` or `range`. See [fixed and range amounts](#fixed-and-range-amounts). |
-| `amount_step` | Range SKUs only. The amount must be a multiple of this value, for example `"1.0000"` means whole numbers only. `null` means no step. |
+| `amount_step` | Range SKUs only. The amount must be a multiple of this value, for example `"1"` means whole numbers only. `null` means no step. |
 | `face_currency` | Currency printed on the card. May differ from your wallet. |
 | `min_quantity`, `max_quantity` | How many units one order line may have. |
 | `product_type` | `pin_code` (you get a code) or `direct_charge` (we top up an account). |
@@ -151,7 +151,7 @@ For a range SKU, `amount` must be between `min_face_value` and `max_face_value`.
 It is in `face_currency`.
 
 Some range SKUs also have an `amount_step`. When it is not `null`, `amount` must be a multiple of it.
-For example, with `"amount_step": "1.0000"` you can send `25` but not `25.50`.
+For example, with `"amount_step": "1"` you can send `25` but not `25.50`.
 A quote or order with an amount that does not fit the step returns HTTP 400 and charges nothing.
 
 ### Direct top-ups
@@ -189,9 +189,9 @@ GET /api/v1/skus/S000789/quote?quantity=1&amount=25.00
 {
   "sku_id": "S000456",
   "settlement_currency": "USD",
-  "merchant_price": "9.2500",
+  "merchant_price": "9.25",
   "quantity": 2,
-  "total_price": "18.5000",
+  "total_price": "18.50",
   "min_quantity": 1,
   "max_quantity": 100,
   "availability": "available"
@@ -213,11 +213,11 @@ Like every call, it must be [signed](AUTHENTICATION.md#signing-a-request).
 {
   "external_order_id": "SHOP-20260929-10001",
   "items": [
-    {"sku_id": "S000456", "quantity": 2, "expected_unit_price": "9.2500"},
-    {"sku_id": "S000789", "amount": "25.00", "expected_unit_price": "23.7500"},
+    {"sku_id": "S000456", "quantity": 2, "expected_unit_price": "9.25"},
+    {"sku_id": "S000789", "amount": "25.00", "expected_unit_price": "23.75"},
     {
       "sku_id": "S000900",
-      "expected_unit_price": "4.9000",
+      "expected_unit_price": "4.90",
       "inputs": {"player_id": "123456789"}
     }
   ]
@@ -246,7 +246,7 @@ The response is HTTP **201**:
     "order_id": "O-00001234",
     "external_order_id": "SHOP-20260929-10001",
     "status": "accepted",
-    "total_amount": "46.2000",
+    "total_amount": "46.20",
     "...": "more fields"
   }
 }
@@ -269,7 +269,7 @@ Example of a price change:
 
 ```json
 {
-  "items": "SKU S000456 price changed from 9.2500 to 9.4100 USD; refresh quote and confirm again."
+  "items": "SKU S000456 price changed from 9.25 to 9.41 USD; refresh quote and confirm again."
 }
 ```
 
@@ -328,7 +328,7 @@ Rules:
   "external_order_id": "SHOP-20260929-10001",
   "status": "succeeded",
   "currency": "USD",
-  "total_amount": "18.5000",
+  "total_amount": "18.50",
   "created_at": "2026-09-29T08:15:30.123456Z",
   "updated_at": "2026-09-29T08:15:41.004211Z",
   "items": [
@@ -336,8 +336,8 @@ Rules:
       "sku_id": "S000456",
       "product_name": "Steam Wallet US",
       "quantity": 2,
-      "unit_price": "9.2500",
-      "total_price": "18.5000",
+      "unit_price": "9.25",
+      "total_price": "18.50",
       "delivery_count": 2,
       "deliveries": [{"...": "see Codes below"}]
     }

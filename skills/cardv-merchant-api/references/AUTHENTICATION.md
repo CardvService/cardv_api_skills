@@ -29,7 +29,7 @@ Send these four headers on every call, including `GET` calls:
 X-Key-Id: ck_live_xxxxxxxxxxxxxxxxxxxxxxxx
 X-Timestamp: 1790000000
 X-Nonce: 0123456789abcdef0123456789abcdef
-X-Signature: 604b31bd10000c85a0e87e3b1e9d42225d7e8213f470b33f206f849ef99f8fcb
+X-Signature: e6e45d09ed271d8d721701b560d56a6f5104fd8a52aaad5380166f432bba6e89
 ```
 
 - `X-Key-Id` is the public ID of your key.
@@ -86,15 +86,15 @@ BODY_HASH    e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 X-Signature  58f0362c355a6624fff9f0b84d47591c570263908832294375b7bf27731628e5
 ```
 
-A `POST` call to `/api/v1/orders` with this body (108 bytes, one line, no newline at the end):
+A `POST` call to `/api/v1/orders` with this body (106 bytes, one line, no newline at the end):
 
 ```json
-{"external_order_id":"TEST-0001","items":[{"sku_id":"S000001","quantity":1,"expected_unit_price":"9.2500"}]}
+{"external_order_id":"TEST-0001","items":[{"sku_id":"S000001","quantity":1,"expected_unit_price":"9.25"}]}
 ```
 
 ```text
-BODY_HASH    b0545ae25d54b219f27d8bd90e4dcbf26cf0d491f53982da67b8eef0a1a59960
-X-Signature  604b31bd10000c85a0e87e3b1e9d42225d7e8213f470b33f206f849ef99f8fcb
+BODY_HASH    5814ffcdadfa9eb69348150f9fd6895c00b4c37cf6cd0202b83174354645023e
+X-Signature  e6e45d09ed271d8d721701b560d56a6f5104fd8a52aaad5380166f432bba6e89
 ```
 
 ## Code samples
@@ -107,7 +107,7 @@ All samples produce the test vector results. Load the secret from your secret st
 BASE_URL="https://sandbox.cardv.net"
 REQ_PATH="/api/v1/orders"      # do not call this variable PATH
 BODY='{"external_order_id":"SHOP-10001","items":'
-BODY+='[{"sku_id":"S000001","quantity":1,"expected_unit_price":"9.2500"}]}'
+BODY+='[{"sku_id":"S000001","quantity":1,"expected_unit_price":"9.25"}]}'
 TS=$(date +%s)
 NONCE=$(openssl rand -hex 16)
 BODY_HASH=$(printf '%s' "$BODY" | openssl dgst -sha256 -hex | sed 's/^.*= //')
@@ -158,7 +158,7 @@ def cardv_post(path: str, payload: dict) -> requests.Response:
 
 resp = cardv_post("/api/v1/orders", {
     "external_order_id": "SHOP-10001",
-    "items": [{"sku_id": "S000001", "quantity": 1, "expected_unit_price": "9.2500"}],
+    "items": [{"sku_id": "S000001", "quantity": 1, "expected_unit_price": "9.25"}],
 })
 print(resp.status_code, resp.json())
 
@@ -197,7 +197,7 @@ async function cardvPost(path, payload) {
 
 console.log(await cardvPost("/api/v1/orders", {
   external_order_id: "SHOP-10001",
-  items: [{ sku_id: "S000001", quantity: 1, expected_unit_price: "9.2500" }],
+  items: [{ sku_id: "S000001", quantity: 1, expected_unit_price: "9.25" }],
 }));
 console.log(await cardvGet("/api/v1/balance"));
 ```

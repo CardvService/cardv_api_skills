@@ -60,8 +60,8 @@ Add `search=att` to filter by operator name.
       "amount_model": "range",
       "currency_codes": ["USD"],
       "amounts": [
-        {"min": "5.0000", "max": "100.0000", "currency": "USD", "subtype": "airtime", "label": "5.0000-100.0000 USD"},
-        {"min": "15.0000", "max": "15.0000", "currency": "USD", "subtype": "data", "label": "15.0000 USD"}
+        {"min": "5", "max": "100", "currency": "USD", "subtype": "airtime", "label": "5-100 USD"},
+        {"min": "15", "max": "15", "currency": "USD", "subtype": "data", "label": "15 USD"}
       ],
       "offer_count": 3
     }
@@ -111,9 +111,9 @@ The response:
   "country_name": "United States",
   "operator": {"operator_key": "us-att", "name": "AT&T", "logo_url": ""},
   "subtype": "airtime",
-  "local_amount": "10.0000",
+  "local_amount": "10",
   "local_currency": "USD",
-  "merchant_price": "9.6200",
+  "merchant_price": "9.62",
   "merchant_currency": "USD",
   "expires_at": "2026-09-30T08:20:30.123456+00:00",
   "quote_token": "eyJ2ZXJzaW9uIjox...:1uXyZa:8c1f..."
@@ -166,9 +166,9 @@ A new order returns HTTP **201**:
     "status_title": "Recharge accepted",
     "poll_after_seconds": 12,
     "account": "12***00",
-    "local_amount": "10.0000",
+    "local_amount": "10",
     "local_currency": "USD",
-    "merchant_price": "9.6200",
+    "merchant_price": "9.62",
     "merchant_currency": "USD",
     "...": "more fields"
   }
@@ -214,9 +214,9 @@ You can use the CardV order ID (`O-00005678`).
   "operator": {"operator_key": "us-att", "name": "AT&T", "logo_url": ""},
   "subtype": "airtime",
   "account": "12***00",
-  "local_amount": "10.0000",
+  "local_amount": "10",
   "local_currency": "USD",
-  "merchant_price": "9.6200",
+  "merchant_price": "9.62",
   "merchant_currency": "USD",
   "attempts": [{"attempt_no": 1, "status": "processing", "error_message": "", "submitted_at": "2026-09-30T08:16:02.511201Z", "completed_at": null}],
   "created_at": "2026-09-30T08:16:01.004211Z",

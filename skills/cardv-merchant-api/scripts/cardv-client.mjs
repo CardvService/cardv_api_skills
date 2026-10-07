@@ -41,10 +41,10 @@ export function selfTest() {
   const ts = "1790000000";
   const nonce = "0123456789abcdef0123456789abcdef";
   const get = sign(secret, "GET", "/api/v1/skus?limit=50", Buffer.alloc(0), ts, nonce);
-  const body = Buffer.from('{"external_order_id":"TEST-0001","items":[{"sku_id":"S000001","quantity":1,"expected_unit_price":"9.2500"}]}');
+  const body = Buffer.from('{"external_order_id":"TEST-0001","items":[{"sku_id":"S000001","quantity":1,"expected_unit_price":"9.25"}]}');
   const post = sign(secret, "POST", "/api/v1/orders", body, ts, nonce);
   if (get !== "58f0362c355a6624fff9f0b84d47591c570263908832294375b7bf27731628e5") throw new Error("GET test vector failed");
-  if (post !== "604b31bd10000c85a0e87e3b1e9d42225d7e8213f470b33f206f849ef99f8fcb") throw new Error("POST test vector failed");
+  if (post !== "e6e45d09ed271d8d721701b560d56a6f5104fd8a52aaad5380166f432bba6e89") throw new Error("POST test vector failed");
   console.log("self-test passed");
 }
 

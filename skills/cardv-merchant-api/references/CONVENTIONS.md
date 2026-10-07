@@ -9,12 +9,13 @@ Related: [Authentication](AUTHENTICATION.md) · [Catalog and orders](CATALOG-AND
 - Base URL: `https://b2b.cardv.net/api/v1` (Live) or `https://sandbox.cardv.net/api/v1` (Sandbox).
 - Paths have **no trailing slash**. Use `/api/v1/orders`, not `/api/v1/orders/`.
 - Send JSON bodies as UTF-8 with `Content-Type: application/json`.
-- Send amounts as strings, for example `"9.2500"`. This avoids rounding errors.
+- Send amounts as strings, for example `"9.25"`. No padding is needed: `"25"`, `"25.5"` and `"25.50"` are the same amount. Up to 4 decimals are accepted.
 - Set a clear `User-Agent`, for example `AcmeShop-CardV/1.4`.
 
 ## Money and time
 
-- Money is a string with 4 decimals, for example `"merchant_price": "9.2500"`.
+- Prices, totals and balances have 2 decimals, for example `"merchant_price": "9.25"`. More decimals appear only when the amount really has them.
+- Face values are written like the card, for example `"denomination_value": "10"` or `"12.50"`.
 - Read it with a decimal type, never a floating-point number.
 - You pay in your wallet currency (`default_currency` in `GET /account`, currently USD).
 - `face_currency` is the currency printed on the card. It can differ from your wallet currency.

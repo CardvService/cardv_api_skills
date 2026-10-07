@@ -59,9 +59,9 @@ def self_test() -> None:
     secret = "cs_test_TEST_ONLY_not_a_real_secret_0123456789abcdef"
     ts, nonce = "1790000000", "0123456789abcdef0123456789abcdef"
     assert sign(secret, "GET", "/api/v1/skus?limit=50", b"", ts, nonce) == "58f0362c355a6624fff9f0b84d47591c570263908832294375b7bf27731628e5"
-    body = b'{"external_order_id":"TEST-0001","items":[{"sku_id":"S000001","quantity":1,"expected_unit_price":"9.2500"}]}'
-    assert hashlib.sha256(body).hexdigest() == "b0545ae25d54b219f27d8bd90e4dcbf26cf0d491f53982da67b8eef0a1a59960"
-    assert sign(secret, "POST", "/api/v1/orders", body, ts, nonce) == "604b31bd10000c85a0e87e3b1e9d42225d7e8213f470b33f206f849ef99f8fcb"
+    body = b'{"external_order_id":"TEST-0001","items":[{"sku_id":"S000001","quantity":1,"expected_unit_price":"9.25"}]}'
+    assert hashlib.sha256(body).hexdigest() == "5814ffcdadfa9eb69348150f9fd6895c00b4c37cf6cd0202b83174354645023e"
+    assert sign(secret, "POST", "/api/v1/orders", body, ts, nonce) == "e6e45d09ed271d8d721701b560d56a6f5104fd8a52aaad5380166f432bba6e89"
     print("self-test passed")
 
 

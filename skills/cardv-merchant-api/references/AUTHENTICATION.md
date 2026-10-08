@@ -235,7 +235,7 @@ The body looks like this:
 | Unknown or disabled key ID | Check `X-Key-Id` and the environment (Live or Sandbox). |
 | API access not enabled | Wait for CardV to approve your business. |
 | Your server's IP is not allowed | Add it to the IP allowlist in the Portal. |
-| Endpoint is Portal only | Use the Portal. Only thirteen endpoints work with a key. |
+| Endpoint is Portal only | Use the Portal. Only fifteen endpoints work with a key. |
 | Missing or wrong signature | Fix your signing code. Test it with the test vectors. |
 | Timestamp too old or new | Sync your server clock (NTP). |
 | Nonce already used | Use a new random nonce on every request. |
@@ -260,7 +260,7 @@ The IP allowlist lets only your servers use your key. You manage it in the Porta
 
 ## API keys
 
-A key can use exactly the thirteen endpoints in
+A key can use exactly the fifteen endpoints in
 [The API at a glance](README.md#the-api-at-a-glance).
 That includes placing orders and reading codes, so guard the signing secret like an Owner password.
 

@@ -157,6 +157,103 @@
         }
       }
     },
+    "/api/v1/products": {
+      "get": {
+        "operationId": "merchant_products_list",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "brand",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "product_type",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "region",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vertical",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {
+            "MerchantKeyIdAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogListResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/products/{product_id}": {
+      "get": {
+        "operationId": "merchant_product_retrieve",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "product_id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {
+            "MerchantKeyIdAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductCatalog"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/v1/recharge/countries": {
       "get": {
         "operationId": "merchant_recharge_countries",
@@ -518,7 +615,8 @@
             "name": "amount",
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Required for range SKUs. Must be between min_face_value and max_face_value and, when the SKU has an amount_step, a multiple of amount_step."
           },
           {
             "in": "query",
@@ -643,11 +741,11 @@
           },
           "name": {
             "type": "string",
-            "maxLength": 200
+            "readOnly": true
           },
           "label": {
             "type": "string",
-            "maxLength": 160
+            "readOnly": true
           },
           "product_name": {
             "type": "string"
@@ -704,17 +802,27 @@
           "denomination_value": {
             "type": "string",
             "format": "decimal",
-            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$"
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$",
+            "readOnly": true
           },
           "min_face_value": {
             "type": "string",
             "format": "decimal",
-            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$"
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$",
+            "readOnly": true
           },
           "max_face_value": {
             "type": "string",
             "format": "decimal",
-            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$"
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$",
+            "readOnly": true
+          },
+          "amount_step": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$",
+            "readOnly": true,
+            "nullable": true
           },
           "face_currency": {
             "type": "string",
@@ -753,20 +861,33 @@
             "maximum": 2147483647,
             "minimum": 0
           },
-          "required_input_schema": {}
+          "required_input_schema": {},
+          "delivery_mode": {
+            "type": "string",
+            "readOnly": true
+          },
+          "voucher_instructions": {
+            "type": "string",
+            "readOnly": true
+          }
         },
         "required": [
+          "amount_step",
           "availability",
           "brand",
           "brand_logo_url",
           "category",
+          "delivery_mode",
           "denomination_value",
           "description",
           "disclaimer",
           "discount",
           "face_value_label",
           "image_url",
+          "label",
+          "max_face_value",
           "merchant_price",
+          "min_face_value",
           "name",
           "price_label",
           "product_id",
@@ -780,7 +901,8 @@
           "settlement_currency",
           "sku_id",
           "terms",
-          "vertical"
+          "vertical",
+          "voucher_instructions"
         ]
       },
       "DeliveryTypeEnum": {
@@ -1182,6 +1304,218 @@
           "total_price",
           "unit_price"
         ]
+      },
+      "ProductCatalog": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "brand": {
+            "type": "string"
+          },
+          "brand_logo_url": {
+            "type": "string",
+            "readOnly": true
+          },
+          "category": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "region": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "region_name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "region_label": {
+            "type": "string",
+            "readOnly": true
+          },
+          "vertical": {
+            "$ref": "#/components/schemas/VerticalEnum"
+          },
+          "product_type": {
+            "$ref": "#/components/schemas/ProductTypeEnum"
+          },
+          "image_url": {
+            "type": "string",
+            "readOnly": true
+          },
+          "description": {
+            "type": "string"
+          },
+          "redemption_instructions": {
+            "type": "string"
+          },
+          "terms": {
+            "type": "string"
+          },
+          "disclaimer": {
+            "type": "string"
+          },
+          "required_input_schema": {},
+          "skus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductSKU"
+            },
+            "readOnly": true
+          }
+        },
+        "required": [
+          "brand",
+          "brand_logo_url",
+          "image_url",
+          "product_id",
+          "product_name",
+          "region_label",
+          "region_name",
+          "skus"
+        ]
+      },
+      "ProductSKU": {
+        "type": "object",
+        "properties": {
+          "sku_id": {
+            "type": "string"
+          },
+          "sku_name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "label": {
+            "type": "string",
+            "readOnly": true
+          },
+          "face_value_label": {
+            "type": "string",
+            "readOnly": true
+          },
+          "denomination_type": {
+            "$ref": "#/components/schemas/DenominationTypeEnum"
+          },
+          "denomination_value": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$",
+            "readOnly": true
+          },
+          "min_face_value": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$",
+            "readOnly": true
+          },
+          "max_face_value": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$",
+            "readOnly": true
+          },
+          "amount_step": {
+            "type": "string",
+            "format": "decimal",
+            "pattern": "^-?\\d{0,8}(?:\\.\\d{0,4})?$",
+            "readOnly": true,
+            "nullable": true
+          },
+          "face_currency": {
+            "type": "string",
+            "maxLength": 3
+          },
+          "delivery_type": {
+            "$ref": "#/components/schemas/DeliveryTypeEnum"
+          },
+          "merchant_price": {
+            "type": "string",
+            "readOnly": true
+          },
+          "settlement_currency": {
+            "type": "string",
+            "readOnly": true
+          },
+          "availability": {
+            "type": "string",
+            "readOnly": true
+          },
+          "price": {
+            "type": "string",
+            "readOnly": true
+          },
+          "price_label": {
+            "type": "string",
+            "readOnly": true
+          },
+          "currency": {
+            "type": "string"
+          },
+          "discount": {
+            "type": "string",
+            "readOnly": true
+          },
+          "available": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "min_quantity": {
+            "type": "integer",
+            "maximum": 2147483647,
+            "minimum": 0
+          },
+          "max_quantity": {
+            "type": "integer",
+            "maximum": 2147483647,
+            "minimum": 0
+          },
+          "delivery_mode": {
+            "type": "string",
+            "readOnly": true
+          },
+          "voucher_instructions": {
+            "type": "string",
+            "readOnly": true
+          }
+        },
+        "required": [
+          "amount_step",
+          "availability",
+          "available",
+          "currency",
+          "delivery_mode",
+          "denomination_value",
+          "discount",
+          "face_value_label",
+          "label",
+          "max_face_value",
+          "merchant_price",
+          "min_face_value",
+          "name",
+          "price",
+          "price_label",
+          "settlement_currency",
+          "sku_id",
+          "sku_name",
+          "voucher_instructions"
+        ]
+      },
+      "ProductTypeEnum": {
+        "enum": [
+          "pin_code",
+          "direct_charge",
+          "mixed"
+        ],
+        "type": "string",
+        "description": "* `pin_code` - PIN code\n* `direct_charge` - Direct charge\n* `mixed` - Mixed"
       },
       "RechargeAmountOption": {
         "type": "object",
@@ -1707,6 +2041,19 @@
         "type": "string",
         "description": "* `airtime` - airtime\n* `data` - data\n* `bundle` - bundle"
       },
+      "VerticalEnum": {
+        "enum": [
+          "gift_card",
+          "game_topup",
+          "mobile_recharge",
+          "data_bundle",
+          "esim",
+          "utilities",
+          "other"
+        ],
+        "type": "string",
+        "description": "* `gift_card` - Gift card\n* `game_topup` - Game top-up\n* `mobile_recharge` - Mobile recharge\n* `data_bundle` - Data bundle\n* `esim` - eSIM\n* `utilities` - Utilities\n* `other` - Other"
+      },
       "WalletAccount": {
         "type": "object",
         "properties": {
@@ -1752,7 +2099,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "X-Key-Id",
-        "description": "Public API key ID (ck_live_... / ck_test_...). Every request must also carry X-Timestamp, X-Nonce and an X-Signature computed with the signing secret."
+        "description": "Public API key ID (ck_live_... / ck_test_...). Every request must also carry X-Timestamp, X-Nonce and an X-Signature computed with the signing secret. See https://cardv.net/developers/authentication/."
       }
     }
   },

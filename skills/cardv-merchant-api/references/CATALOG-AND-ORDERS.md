@@ -137,6 +137,61 @@ Tips:
 - Sync the SKU list every 5–15 minutes. Always get a quote right before you order.
 - `filter_options` lists the brands, regions and product lines you can filter by.
 
+### Sync by product
+
+If your store shows one page per product with an amount picker, sync products instead of SKUs.
+`GET /api/v1/products` lists products. Each product carries all the SKUs you can buy in it.
+
+```http
+GET /api/v1/products?brand=Steam&region=GB&limit=50&offset=0
+```
+
+It takes the same filters and paging as `GET /api/v1/skus`. `count` counts products and `sku_count` counts their SKUs.
+
+```json
+{
+  "count": 1,
+  "sku_count": 4,
+  "limit": 50,
+  "results": [
+    {
+      "product_id": "P000123",
+      "product_name": "Steam Wallet UK",
+      "brand": "Steam",
+      "category": "Gaming",
+      "region": "GB",
+      "product_type": "pin_code",
+      "image_url": "https://b2b.cardv.net/api/v1/catalog-assets/steam.png",
+      "required_input_schema": [],
+      "skus": [
+        {
+          "sku_id": "S000456",
+          "name": "Steam Wallet 5 GBP",
+          "label": "5 GBP",
+          "denomination_type": "fixed",
+          "denomination_value": "5",
+          "face_currency": "GBP",
+          "merchant_price": "7.61",
+          "settlement_currency": "USD",
+          "availability": "available",
+          "min_quantity": 1,
+          "max_quantity": 100,
+          "...": "more fields"
+        }
+      ]
+    }
+  ],
+  "filter_options": {"brands": [], "regions": [], "categories": [], "verticals": []}
+}
+```
+
+`GET /api/v1/products/{product_id}` returns one product with its SKUs, plus `description`, `redemption_instructions`, `terms` and `disclaimer`.
+
+- Each SKU in `skus` has the same fields and values as in `GET /api/v1/skus`. Quote and order with its `sku_id` as usual.
+- Use `label` as the option text, for example `5 GBP` or `Tinder Plus 1 Month`. Some products are plans, not amounts.
+- One product has one face currency and one amount type. A range SKU is always a product of its own.
+- The list leaves out the long texts. Read them once per product from `GET /api/v1/products/{product_id}`.
+
 ### Fixed and range amounts
 
 Most SKUs have a **fixed** face value, such as 10 USD.

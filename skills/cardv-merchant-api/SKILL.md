@@ -24,9 +24,9 @@ CardV is a B2B supplier of prepaid digital goods. A merchant's server buys them 
 
 Keys, wallets, orders, SKU IDs and webhooks are separate per environment. Never copy Sandbox SKU IDs into Live config. Sandbox starts with 1,000 USD of test money.
 
-Only these 13 endpoints accept an API key; everything else (funding, webhooks setup, API keys, IP allowlist, invoices, CSV exports) is Portal only and returns 403:
+Only these 15 endpoints accept an API key; everything else (funding, webhooks setup, API keys, IP allowlist, invoices, CSV exports) is Portal only and returns 403:
 
-`GET /account` · `GET /balance` · `GET /skus` · `GET /skus/{sku_id}` · `GET /skus/{sku_id}/quote` · `POST /orders` · `GET /orders/{order_id}` · `GET /recharge/countries` · `GET /recharge/operators` · `POST /recharge/quote` · `POST /recharge/orders` · `GET /recharge/orders` · `GET /recharge/orders/{order_id}`
+`GET /account` · `GET /balance` · `GET /products` · `GET /products/{product_id}` · `GET /skus` · `GET /skus/{sku_id}` · `GET /skus/{sku_id}/quote` · `POST /orders` · `GET /orders/{order_id}` · `GET /recharge/countries` · `GET /recharge/operators` · `POST /recharge/quote` · `POST /recharge/orders` · `GET /recharge/orders` · `GET /recharge/orders/{order_id}`
 
 ## Signing every request
 
@@ -49,7 +49,7 @@ Auth failures are HTTP **403** (not 401) with `{"detail": ...}`; rate limit is *
 
 1. `GET /account`: confirm `api_access_enabled: true`; read `purchase_limits`.
 2. `GET /balance`: spend only `available_balance`.
-3. `GET /skus?search=...&region=...&limit=...&offset=...`: page until `offset >= count` (max `limit` 500). `search` matches SKU ID, name or brand; `region` is a country code such as `US`. Order only `availability: "available"`. Cache the list 5–15 minutes. Map your products to `sku_id` once (in config or a table) instead of matching names on every order. Sandbox has a small test catalog with different SKU IDs from Live.
+3. Catalog: if the store shows one page per product with an amount picker, sync `GET /products` (each product carries its `skus[]`, same fields as `/skus`; use `label` as the option text). Otherwise `GET /skus?search=...&region=...&limit=...&offset=...`: page until `offset >= count` (max `limit` 500). `search` matches SKU ID, name or brand; `region` is a country code such as `US`. Order only `availability: "available"`. Cache the list 5–15 minutes. Map your products to `sku_id` once (in config or a table) instead of matching names on every order. Sandbox has a small test catalog with different SKU IDs from Live.
 4. `GET /skus/{sku_id}/quote?quantity=N` (range SKUs also `&amount=` in `face_currency`). A quote does not hold the price.
 5. `POST /orders` (signed) with a unique `external_order_id` (1–120 chars, `A–Z a–z 0–9 - _ .`) and `expected_unit_price` = the quoted `merchant_price` on every line. Range SKUs send `amount`; direct top-ups send `inputs` per `required_input_schema`. `201` = new order, charged in full at once.
 6. Read codes with `GET /orders/{order_id}` or after a webhook. Codes are in `items[].deliveries[]`: give the customer every non-empty field (`card_number`, `pin_code`, `redeem_url`, `expiry_date`, `instructions`); never deliver a unit with `status: "voided"`.

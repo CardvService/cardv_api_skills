@@ -179,6 +179,130 @@
       ]
     },
     {
+      "name": "Catalog",
+      "item": [
+        {
+          "name": "GET /api/v1/products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products"
+              ],
+              "variable": []
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "GET /api/v1/products/{product_id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products/:product_id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products",
+                ":product_id"
+              ],
+              "variable": [
+                {
+                  "key": "product_id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "GET /api/v1/skus",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/skus",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "skus"
+              ],
+              "variable": []
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "GET /api/v1/skus/{sku_id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/skus/:sku_id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "skus",
+                ":sku_id"
+              ],
+              "variable": [
+                {
+                  "key": "sku_id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "GET /api/v1/skus/{sku_id}/quote",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/skus/:sku_id/quote",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "skus",
+                ":sku_id",
+                "quote"
+              ],
+              "variable": [
+                {
+                  "key": "sku_id",
+                  "value": ""
+                }
+              ]
+            },
+            "description": ""
+          }
+        }
+      ]
+    },
+    {
       "name": "Mobile recharge",
       "item": [
         {
@@ -339,84 +463,6 @@
                 }
               }
             }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Catalog",
-      "item": [
-        {
-          "name": "GET /api/v1/skus",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/skus",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "skus"
-              ],
-              "variable": []
-            },
-            "description": ""
-          }
-        },
-        {
-          "name": "GET /api/v1/skus/{sku_id}",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/skus/:sku_id",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "skus",
-                ":sku_id"
-              ],
-              "variable": [
-                {
-                  "key": "sku_id",
-                  "value": ""
-                }
-              ]
-            },
-            "description": ""
-          }
-        },
-        {
-          "name": "GET /api/v1/skus/{sku_id}/quote",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/skus/:sku_id/quote",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "skus",
-                ":sku_id",
-                "quote"
-              ],
-              "variable": [
-                {
-                  "key": "sku_id",
-                  "value": ""
-                }
-              ]
-            },
-            "description": ""
           }
         }
       ]

@@ -1,6 +1,6 @@
 # Conventions
 
-Rules that apply to all thirteen endpoints.
+Rules that apply to all fifteen endpoints.
 
 Related: [Authentication](AUTHENTICATION.md) · [Catalog and orders](CATALOG-AND-ORDERS.md) · [README](README.md)
 

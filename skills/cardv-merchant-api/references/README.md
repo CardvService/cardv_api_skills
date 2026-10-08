@@ -92,12 +92,14 @@ The IDs and prices above are examples. Use the values your own catalog returns.
 
 ## The API at a glance
 
-There are thirteen endpoints. Paths start with `/api/v1`.
+There are fifteen endpoints. Paths start with `/api/v1`.
 
 | Endpoint | What it is for | Signed |
 | --- | --- | --- |
 | `GET /account` | Your company details and API status | No |
 | `GET /balance` | How much money you can spend | No |
+| `GET /products` | List products, each with all its SKUs | No |
+| `GET /products/{product_id}` | One product with its SKUs and full texts | No |
 | `GET /skus` | List products you can buy, with your price | No |
 | `GET /skus/{sku_id}` | One product | No |
 | `GET /skus/{sku_id}/quote` | Current price for a quantity | No |

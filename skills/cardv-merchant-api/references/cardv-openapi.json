@@ -77,6 +77,84 @@
         }
       }
     },
+    "/api/v1/fx-rates": {
+      "get": {
+        "operationId": "merchant_fx_rate",
+        "description": "Reference exchange rate from USD to another currency, for stores that price in a currency other than USD. CardV always charges your wallet in USD. Rates are updated every hour.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "base",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Base currency. Only USD is supported."
+          },
+          {
+            "in": "query",
+            "name": "quote",
+            "schema": {
+              "type": "string"
+            },
+            "description": "ISO 4217 currency code, e.g. EUR.",
+            "required": true
+          }
+        ],
+        "tags": [
+          "v1"
+        ],
+        "security": [
+          {
+            "MerchantKeyIdAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceFxRateResponse"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              }
+            },
+            "description": ""
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              }
+            },
+            "description": ""
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/v1/orders": {
       "post": {
         "operationId": "merchant_order_create",
@@ -2030,6 +2108,32 @@
           "amount",
           "country",
           "operator_key"
+        ]
+      },
+      "ReferenceFxRateResponse": {
+        "type": "object",
+        "properties": {
+          "base": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string"
+          },
+          "rate": {
+            "type": "string",
+            "description": "Units of quote currency per 1 USD, as a decimal string."
+          },
+          "as_of": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When CardV last verified this rate."
+          }
+        },
+        "required": [
+          "as_of",
+          "base",
+          "quote",
+          "rate"
         ]
       },
       "SubtypeEnum": {

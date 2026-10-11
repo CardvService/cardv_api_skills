@@ -110,6 +110,32 @@
             },
             "description": ""
           }
+        },
+        {
+          "name": "GET /api/v1/fx-rates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/fx-rates?quote=EUR",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "fx-rates"
+              ],
+              "query": [
+                {
+                  "key": "quote",
+                  "value": "EUR"
+                }
+              ],
+              "variable": []
+            },
+            "description": "Reference exchange rate from USD to another currency, for stores that price in a currency other than USD. CardV always charges your wallet in USD. Rates are updated every hour."
+          }
         }
       ]
     },
@@ -332,7 +358,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/v1/recharge/operators",
+              "raw": "{{baseUrl}}/api/v1/recharge/operators?country=GB",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -341,6 +367,12 @@
                 "v1",
                 "recharge",
                 "operators"
+              ],
+              "query": [
+                {
+                  "key": "country",
+                  "value": "GB"
+                }
               ],
               "variable": []
             },

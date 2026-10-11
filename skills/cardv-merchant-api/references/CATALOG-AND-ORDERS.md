@@ -58,6 +58,36 @@ Related: [Authentication](AUTHENTICATION.md) · [Conventions](CONVENTIONS.md) ·
 - `low_balance_threshold` is the level for the low-balance email. You set it in the Portal.
 - To add money, use the Portal.
 
+### Exchange rate
+
+`GET /api/v1/fx-rates?quote=EUR` gives the rate from USD to another currency.
+
+Use it if your store sells in a currency other than USD. CardV always charges your wallet in USD. The rate only helps you set your own prices.
+
+```json
+{
+  "base": "USD",
+  "quote": "EUR",
+  "rate": "0.9234",
+  "as_of": "2026-10-11T07:05:00Z"
+}
+```
+
+- `quote` is an ISO 4217 currency code, such as `EUR`, `GBP` or `JPY`.
+- `base` is optional. Only `USD` is supported.
+- `rate` is how many units of `quote` you get for 1 USD. It is a decimal string. Do not read it as a float.
+- `as_of` is when CardV last updated this rate. Rates are updated every hour.
+- `quote=USD` returns `"rate": "1"`.
+- Save the rate on your side. Asking a few times a day is enough.
+
+| Status | Meaning | What to do |
+| --- | --- | --- |
+| 400 | `quote` is missing or is not a 3-letter code, or `base` is not `USD` | Fix the request |
+| 404 | `No exchange rate for this currency.` | Set prices in this currency yourself |
+| 503 | `Exchange rate temporarily unavailable.` | Keep using the last rate you saved, and try again later |
+
+Sign this request like any other. The signed path includes the query string, for example `/api/v1/fx-rates?quote=EUR`.
+
 ## Products (SKUs)
 
 A **SKU** is one product you can buy, for example "Steam Wallet 10 USD".

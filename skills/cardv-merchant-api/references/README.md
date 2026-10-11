@@ -11,7 +11,7 @@ Everything else, such as adding funds and viewing order history, is done in the 
 | Document | What it covers |
 | --- | --- |
 | [Authentication](AUTHENTICATION.md) | Headers, signing requests, key setup |
-| [Catalog and orders](CATALOG-AND-ORDERS.md) | Balance, products, prices, orders, codes |
+| [Catalog and orders](CATALOG-AND-ORDERS.md) | Balance, exchange rate, products, prices, orders, codes |
 | [Mobile recharge](MOBILE-RECHARGE.md) | Phone top-ups: operators, quotes, recharge orders |
 | [Conventions](CONVENTIONS.md) | Money, dates, IDs, rate limit, errors |
 | [Webhooks](WEBHOOKS.md) | Order notifications sent to your server |
@@ -92,12 +92,13 @@ The IDs and prices above are examples. Use the values your own catalog returns.
 
 ## The API at a glance
 
-There are fifteen endpoints. Paths start with `/api/v1`.
+There are sixteen endpoints. Paths start with `/api/v1`.
 
 | Endpoint | What it is for | Signed |
 | --- | --- | --- |
 | `GET /account` | Your company details and API status | No |
 | `GET /balance` | How much money you can spend | No |
+| `GET /fx-rates` | Exchange rate from USD, for stores priced in another currency | No |
 | `GET /products` | List products, each with all its SKUs | No |
 | `GET /products/{product_id}` | One product with its SKUs and full texts | No |
 | `GET /skus` | List products you can buy, with your price | No |

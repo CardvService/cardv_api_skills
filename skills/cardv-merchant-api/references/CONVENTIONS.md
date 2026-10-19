@@ -20,6 +20,7 @@ Related: [Authentication](AUTHENTICATION.md) · [Catalog and orders](CATALOG-AND
 - You pay in your wallet currency (`default_currency` in `GET /account`, currently USD).
 - `face_currency` is the currency printed on the card. It can differ from your wallet currency.
 - Always use `merchant_price` for your costs. Labels such as `price_label` are for display only.
+  For a `range` SKU, the list `merchant_price` is only the price of the lowest amount: quote the exact amount to get your cost.
 - All times are UTC in ISO 8601, for example `2026-09-29T08:15:30.123456Z`.
 - Use a real ISO 8601 parser. The number of decimals in seconds can vary.
 - `X-Timestamp` for signing is Unix time in seconds.

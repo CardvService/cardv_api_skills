@@ -913,6 +913,14 @@
             "type": "string",
             "readOnly": true
           },
+          "merchant_price_min": {
+            "type": "string",
+            "readOnly": true
+          },
+          "merchant_price_max": {
+            "type": "string",
+            "readOnly": true
+          },
           "price_label": {
             "type": "string",
             "readOnly": true
@@ -965,6 +973,8 @@
           "label",
           "max_face_value",
           "merchant_price",
+          "merchant_price_max",
+          "merchant_price_min",
           "min_face_value",
           "name",
           "price_label",
@@ -1518,6 +1528,14 @@
             "type": "string",
             "readOnly": true
           },
+          "merchant_price_min": {
+            "type": "string",
+            "readOnly": true
+          },
+          "merchant_price_max": {
+            "type": "string",
+            "readOnly": true
+          },
           "settlement_currency": {
             "type": "string",
             "readOnly": true
@@ -1576,6 +1594,8 @@
           "label",
           "max_face_value",
           "merchant_price",
+          "merchant_price_max",
+          "merchant_price_min",
           "min_face_value",
           "name",
           "price",

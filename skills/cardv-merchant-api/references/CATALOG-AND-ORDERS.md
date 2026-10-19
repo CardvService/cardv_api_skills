@@ -93,6 +93,21 @@ Sign this request like any other. The signed path includes the query string, for
 A **SKU** is one product you can buy, for example "Steam Wallet 10 USD".
 Its ID looks like `S000456`. You quote and order SKUs.
 
+### Product models
+
+Every SKU is one of these models. Read `denomination_type` and `product_type` to tell them apart.
+
+| Model | How to recognise it | Price | Order | You receive |
+| --- | --- | --- | --- | --- |
+| Fixed amount | `denomination_type: "fixed"` | `merchant_price` is the price of one unit. | Send `quantity`. | Codes in `deliveries`. |
+| Range amount | `denomination_type: "range"` | `merchant_price_min` to `merchant_price_max`. The real price depends on the amount: [quote](#price-quote) it. | Send `quantity` and `amount`. | Codes in `deliveries`. |
+| Direct top-up | `product_type: "direct_charge"` | Same as fixed. | Also send `inputs` (see [direct top-ups](#direct-top-ups)). | Usually no codes. `succeeded` means the account was topped up. |
+| Mobile recharge | Not in this catalog | Its own quote | Its own API | See [Mobile recharge](MOBILE-RECHARGE.md). |
+
+- `vertical` is the product line, not the model. Direct top-ups can still have `vertical: "gift_card"`.
+- Any fixed or range SKU can be delivered as a **CardV redemption link** instead of a code. The SKU then has `delivery_mode: "voucher"`.
+  You receive a link (`delivery_type: "link"`, the link is in `redeem_url`). Your customer opens it to get the code. Send it to your customer like a code.
+
 `GET /api/v1/skus` lists the SKUs you can buy. Example:
 
 ```http
@@ -116,7 +131,7 @@ Keep asking with a higher `offset` until `offset` reaches `count`.
 ```json
 {
   "count": 7,
-  "limit": 1,
+  "limit": 2,
   "results": [
     {
       "sku_id": "S000456",
@@ -131,11 +146,36 @@ Keep asking with a higher `offset` until `offset` reaches `count`.
       "denomination_value": "10",
       "face_currency": "USD",
       "merchant_price": "9.25",
+      "merchant_price_min": "9.25",
+      "merchant_price_max": "9.25",
       "settlement_currency": "USD",
       "availability": "available",
       "min_quantity": 1,
       "max_quantity": 100,
       "required_input_schema": [],
+      "...": "more fields"
+    },
+    {
+      "sku_id": "S006126",
+      "product_id": "P002210",
+      "name": "Apple ES",
+      "product_name": "Apple ES",
+      "brand": "Apple",
+      "region": "ES",
+      "vertical": "gift_card",
+      "product_type": "pin_code",
+      "denomination_type": "range",
+      "denomination_value": "0",
+      "min_face_value": "2",
+      "max_face_value": "250",
+      "amount_step": null,
+      "face_currency": "EUR",
+      "merchant_price": "2.28",
+      "merchant_price_min": "2.28",
+      "merchant_price_max": "284.15",
+      "price_label": "From 2.28 USD",
+      "settlement_currency": "USD",
+      "availability": "available",
       "...": "more fields"
     }
   ],
@@ -150,16 +190,27 @@ The most useful fields:
 | Field | Meaning |
 | --- | --- |
 | `sku_id` | The ID you use to quote and order. |
-| `merchant_price` | Your price per unit, in `settlement_currency`. |
+| `merchant_price` | Your price per unit, in `settlement_currency`. For a `range` SKU this is only the price of `min_face_value`, a starting price. Do not use it for other amounts: get a [quote](#price-quote) with `amount`. |
 | `availability` | `available` or `unavailable`. Only order `available` SKUs. |
 | `denomination_type` | `fixed` or `range`. See [fixed and range amounts](#fixed-and-range-amounts). |
+| `denomination_value` | Face value of a `fixed` SKU. `"0"` for a `range` SKU. |
+| `min_face_value`, `max_face_value` | `range` SKUs: the lowest and highest amount your customer can choose, in `face_currency`. |
+| `merchant_price_min`, `merchant_price_max` | Price of the lowest and highest amount. Equal to `merchant_price` for `fixed` SKUs. Use them to show a price range; always [quote](#price-quote) the exact amount before you order. `merchant_price_max` is `""` when it cannot be priced right now. |
+| `price_label` | `merchant_price` as display text. For `range` SKUs it starts with `From`, for example `From 2.28 USD`. |
+| `face_value_label` | Face value as display text, for example `10 USD` or `50 - 1000 GBP`. |
+| `discount` | Discount on the face value, for example `7.50% off face value`. Only for `fixed` SKUs whose face currency is your wallet currency; otherwise `""`. |
 | `amount_step` | Range SKUs only. The amount must be a multiple of this value, for example `"1"` means whole numbers only. `null` means no step. |
 | `face_currency` | Currency printed on the card. May differ from your wallet. |
 | `min_quantity`, `max_quantity` | How many units one order line may have. |
 | `product_type` | `pin_code` (you get a code) or `direct_charge` (we top up an account). |
+| `delivery_type` | What the supplier delivers: `code`, `code_pin`, `code_serial`, `url` or `direct_charge`. When `delivery_mode` is `voucher`, you get a link instead. |
+| `delivery_mode` | `code` (you get the code itself) or `voucher` (you get a CardV redemption link). |
+| `voucher_instructions` | For `voucher` SKUs: text that tells your customer how to use the link. Otherwise `""`. |
+| `vertical`, `category` | Product line and business category, for filters and display. |
+| `region`, `region_name`, `region_label` | Country or area code, its name, and a display label. |
 | `required_input_schema` | Details you must send for [direct top-ups](#direct-top-ups). |
 | `brand_logo_url`, `image_url` | Images hosted by CardV, or `""`. |
-| `description`, `redemption_instructions`, `terms` | Text you can show your customers. |
+| `description`, `redemption_instructions`, `terms`, `disclaimer` | Text you can show your customers. |
 
 Tips:
 
@@ -235,6 +286,8 @@ Some SKUs have a **range**: your customer chooses the amount, such as 5 to 500 U
 For a range SKU, `amount` must be between `min_face_value` and `max_face_value`.
 It is in `face_currency`.
 
+**Price of a range SKU.** In the SKU and product lists, `merchant_price` and `price_label` are the price of `min_face_value` only. `merchant_price_min` and `merchant_price_max` give the price of the lowest and highest amount. The price of an amount in between is not a simple multiple of either. Before you set your selling price or order, get a [quote](#price-quote) with the exact `amount` and send that quote's `merchant_price` as `expected_unit_price`.
+
 Some range SKUs also have an `amount_step`. When it is not `null`, `amount` must be a multiple of it.
 For example, with `"amount_step": "1"` you can send `25` but not `25.50`.
 A quote or order with an amount that does not fit the step returns HTTP 400 and charges nothing.
@@ -246,8 +299,8 @@ For these, CardV needs the account details. The SKU lists them:
 
 ```json
 "required_input_schema": [
-  {"key": "player_id", "label": "Player ID", "required": true},
-  {"key": "server", "label": "Server", "required": false}
+  {"key": "player_id", "label": "Player ID", "type": "text", "required": true},
+  {"key": "server", "label": "Server", "type": "text", "required": false}
 ]
 ```
 
@@ -257,7 +310,7 @@ Send the values in the order line's `inputs`, using each `key`:
 "inputs": {"player_id": "123456789", "server": "EU"}
 ```
 
-- A field is required unless it says `"required": false`.
+- A field is required unless it says `"required": false`. `type` is a hint for your form field, such as `text`.
 - If a required value is missing, the order is rejected with an `items` error.
 - These values are your customer's personal data. Protect them (see [Security](SECURITY.md)).
 

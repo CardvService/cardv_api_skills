@@ -539,11 +539,13 @@ Each delivered unit is one object in `items[].deliveries`:
 | `card_number` | The main code: card number, voucher code or PIN. |
 | `pin_code` | The second code, such as a PIN or security code. Empty when there is none. |
 | `redeem_url` | Redemption link. For `link` deliveries the link itself is the code. |
+| `expiry_date` | Last day the code can be used, as `YYYY-MM-DD`. `""` means the supplier gave no expiry date. It does **not** mean the code has expired. |
 
 - **Give your customer every field that is not empty**: `card_number`, `pin_code`,
   `redeem_url`, `expiry_date` and `instructions`.
 - `delivery_type` says what you got: `code`, `card_pin`, `link`, `code_link` or `qr`.
 - Keep `redeem_url` secret, like a code.
+- Never delete, hide or void a code because `expiry_date` is empty. Show an expiry date to your customer only when it is not empty.
 - Never give your customer a unit whose `status` is `voided`.
 - Direct top-up products usually have no deliveries. `succeeded` means the account was topped up.
 - Webhooks never contain codes. Read the order after a webhook arrives.

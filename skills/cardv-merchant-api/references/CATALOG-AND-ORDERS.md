@@ -216,6 +216,8 @@ Tips:
 
 - You only see SKUs that are active and open to your account. Other SKUs return 404.
 - Sync the SKU list every 5–15 minutes. Always get a quote right before you order.
+- Show your customers prices from your synced list. Do not call the quote endpoint for every page view or visitor.
+- Range SKU prices follow the supplier cost and can change a few times a day. Refresh `merchant_price_min` and `merchant_price_max` with your SKU sync.
 - `filter_options` lists the brands, regions and product lines you can filter by.
 
 ### Sync by product
@@ -337,7 +339,9 @@ GET /api/v1/skus/S000789/quote?quantity=1&amount=25.00
 ```
 
 - A quote does **not** hold the price. Prices can change at any time.
+- Quote once, when your customer checks out, with a short timeout such as 5 seconds. If the quote times out, keep showing your synced price and try again; never show an error page because a quote was slow.
 - To protect yourself, send `merchant_price` as `expected_unit_price` when you order.
+  Send the price from a quote, not a price you calculated yourself: it must match exactly, to the cent.
   If the price changed, CardV rejects the order and charges nothing.
 - A quantity or amount out of range, or an amount that is not a multiple of `amount_step`,
   returns HTTP 400 with a `quantity` or `amount` error.
